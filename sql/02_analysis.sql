@@ -70,7 +70,7 @@ GROUP BY "DiscountRate";
 -- ------ CUSTOMER ANALYSIS ------
 
 
--- Question: Are customers from certain regions more lucrative for the retailer?
+-- Question: Does the retailer make more profit, on average, off customers from certain regions?
 
 WITH "tp_by_customer" AS (
 SELECT "CustomerID", "Region", SUM("RealizedProfit") AS "TotalProfit"
@@ -78,29 +78,66 @@ FROM "v_master_orders"
 GROUP BY "CustomerID"
 )
 
-SELECT "Region", ROUND(AVG("TotalProfit"), 2) AS "Average Profit, Per Customer"
+SELECT "Region", ROUND(AVG("TotalProfit"), 2) AS "Average Profit Per Customer"
 FROM "tp_by_customer"
 GROUP BY "Region"
-ORDER BY "Average Profit, Per Customer" DESC;
+ORDER BY "Average Profit Per Customer" DESC;
 
 -- Result: Customers in the Mediterranean region make the store the most profit per customer on average, with an
 -- average total profit per customer of 207.33. In four of the five regions (Mediterranean, Aegean, Marmara, and
 -- Central Anatolia), the average profit per customer is roughly the same, being between 201 and 208. However, in the
 -- Black Sea region, average profit per customer is noticeably lower, at 168.16.
 
--- Question: Are customers from certain cities more lucrative for the retailer?
+-- Question: Does the retailer make more profit, on average, off customers from certain cities?
+
 WITH "tp_by_customer" AS (
 SELECT "CustomerID", "City", SUM("RealizedProfit") AS "TotalProfit"
 FROM "v_master_orders"
 GROUP BY "CustomerID"
 )
 
-SELECT "City", ROUND(AVG("TotalProfit"), 2) AS "Average Profit, Per Customer"
+SELECT "City", ROUND(AVG("TotalProfit"), 2) AS "Average Profit Per Customer"
 FROM "tp_by_customer"
 GROUP BY "City"
-ORDER BY "Average Profit, Per Customer" DESC;
+ORDER BY "Average Profit Per Customer" DESC;
 
 -- Result: When looking at individual cities, differences in average total profit per customer are more noticeable.
 -- In Eskisehir, the average profit per customer is 221.55, while in Kocaeli, the average profit per customer is just 180.49.
--- This could mean that a customer's city may be a better indicator of how much profit they will generate the retailer, rather than
--- their region.
+-- This could mean that a customer's city may be a better indicator of how much profit they will generate for the retailer, 
+-- rather than their region.
+
+-- Question: Does the retailer make more profit, on average, off customers from a certain gender?
+
+WITH "tp_by_customer" AS (
+SELECT "CustomerID", "Gender", SUM("RealizedProfit") AS "TotalProfit"
+FROM "v_master_orders"
+GROUP BY "CustomerID"
+)
+
+SELECT "Gender", ROUND(AVG("TotalProfit"), 2) AS "Average Profit Per Customer"
+FROM "tp_by_customer"
+GROUP BY "Gender"
+ORDER BY "Average Profit Per Customer" DESC;
+
+-- Result: The average profit per customer is roughly the same across all genders, with female customers making the retailer
+-- the most profit on average, with an average profit per female customer of 204.74.
+
+-- Question: Do Premium and VIP customers spend more, on average, than Standard customers?
+
+WITH "tr_by_customer" AS (
+SELECT "CustomerID", "CustomerSegment", SUM("TotalRevenue") AS "TotalRevenue"
+FROM "v_master_orders"
+GROUP BY "CustomerID"
+)
+
+SELECT "CustomerSegment", ROUND(AVG("TotalRevenue"), 2) AS "Average Revenue Per Customer"
+FROM "tr_by_customer"
+GROUP BY "CustomerSegment"
+ORDER BY "Average Revenue Per Customer";
+
+-- Result: Premium and VIP members spend noticeably more than Standard customers. Standard customers generate the retailer an average
+-- revenue per customer of 486.81, while Premium members spend almost double that, generating the retailer an average revenue per customer
+-- of 964.69. VIP members spend almost double that amount again, generating the retailer an average revenue per customer of 1848.04.
+
+
+-- ------ PRODUCT ANALYSIS -------
