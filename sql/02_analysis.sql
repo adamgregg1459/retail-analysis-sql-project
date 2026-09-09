@@ -5,7 +5,7 @@
 -- ------- RETURN ANALYSIS -------
 
 
--- Question: Is final unit price associated with whether an item gets returned?
+-- Question: Do returned items tend to be more expensive than non-returned ones?
 WITH "par" AS (
 SELECT "UnitPrice" * (1 - "DiscountRate") AS "FinalUnitPrice", "IsReturned" FROM "order_details"
 )
@@ -15,10 +15,11 @@ FROM "par"
 GROUP BY "IsReturned";
 
 -- Result: After applying discounts, non-returned items had an average price of 9.47 per unit,
--- while returned items had an average price of 8.93 per unit. While returned items in this
--- dataset do show a slightly lower average per-unit price than non-returned items, this difference
--- is quite small, indicating that there is little association between average per-unit price
--- and whether an item was returned.
+-- while returned items had an average price of 8.93 per unit. So, returned items in this
+-- dataset show a slightly lower average per-unit price than non-returned items. However, this difference
+-- is quite small, indicating that there is little association between whether an item was returned
+-- and average per-unit price.
+
 
 -- Question: Is number of units purchased associated with whether an item gets returned? 
 
@@ -52,3 +53,54 @@ ORDER BY
 -- had the second-highest rate of return at 4.73%. Thus, as quantity purchased increases, return rates
 -- show no clear pattern, suggesting little association between the number of units purchased
 -- and whether an item gets returned.
+
+
+-- Question: Is discount rate associated with whether an item gets returned?
+SELECT "DiscountRate", ROUND(AVG("IsReturned") * 100, 2) AS "PercentageReturned"
+FROM "order_details"
+GROUP BY "DiscountRate";
+
+-- Result: Across all discount rates, the percentage of items returned is roughly the same. Items with a 25%
+-- discount rate were most likely to be returned with a return rate of 6.24%, while items with a 20% discount
+-- rate were least likely to be returned with a return rate of 4.25%. Given that two very close discount rates
+-- are associated with both the highest and lowest percentage of items returned, there seems to be no clear
+-- association between discount rate and whether an item gets returned.
+
+
+-- ------ CUSTOMER ANALYSIS ------
+
+
+-- Question: Are customers from certain regions more lucrative for the retailer?
+
+WITH "tp_by_customer" AS (
+SELECT "CustomerID", "Region", SUM("RealizedProfit") AS "TotalProfit"
+FROM "v_master_orders"
+GROUP BY "CustomerID"
+)
+
+SELECT "Region", ROUND(AVG("TotalProfit"), 2) AS "Average Profit, Per Customer"
+FROM "tp_by_customer"
+GROUP BY "Region"
+ORDER BY "Average Profit, Per Customer" DESC;
+
+-- Result: Customers in the Mediterranean region make the store the most profit per customer on average, with an
+-- average total profit per customer of 207.33. In four of the five regions (Mediterranean, Aegean, Marmara, and
+-- Central Anatolia), the average profit per customer is roughly the same, being between 201 and 208. However, in the
+-- Black Sea region, average profit per customer is noticeably lower, at 168.16.
+
+-- Question: Are customers from certain cities more lucrative for the retailer?
+WITH "tp_by_customer" AS (
+SELECT "CustomerID", "City", SUM("RealizedProfit") AS "TotalProfit"
+FROM "v_master_orders"
+GROUP BY "CustomerID"
+)
+
+SELECT "City", ROUND(AVG("TotalProfit"), 2) AS "Average Profit, Per Customer"
+FROM "tp_by_customer"
+GROUP BY "City"
+ORDER BY "Average Profit, Per Customer" DESC;
+
+-- Result: When looking at individual cities, differences in average total profit per customer are more noticeable.
+-- In Eskisehir, the average profit per customer is 221.55, while in Kocaeli, the average profit per customer is just 180.49.
+-- This could mean that a customer's city may be a better indicator of how much profit they will generate the retailer, rather than
+-- their region.
