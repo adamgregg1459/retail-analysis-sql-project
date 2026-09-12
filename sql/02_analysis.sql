@@ -1,5 +1,5 @@
 ----------------------------------
---------     ANALYSIS     --------
+----------   ANALYSIS   ----------
 ----------------------------------
 
 -- ------- RETURN ANALYSIS -------
@@ -74,18 +74,18 @@ GROUP BY "DiscountRate";
 WITH "tpbc" AS (
     SELECT "CustomerID", "Region", SUM("RealizedProfit") AS "TotalProfit"
     FROM "v_master_orders"
-    GROUP BY "CustomerID"
+    GROUP BY "CustomerID", "Region"
 )
 
-SELECT "Region", ROUND(AVG("TotalProfit"), 2) AS "Average Profit Per-Customer"
+SELECT "Region", ROUND(AVG("TotalProfit"), 2) AS "Average Profit Per Customer"
 FROM "tpbc"
 GROUP BY "Region"
-ORDER BY "Average Profit Per-Customer" DESC;
+ORDER BY "Average Profit Per Customer" DESC;
 
--- Result: Customers in the Mediterranean region are the most profitable, making the store an average profit
--- per-customer of 207.33. Between the Mediterranean and three of the four other regions (Aegean, Marmara, 
--- and Central Anatolia), the average profit per customer is roughly the same, being between 201 and 208. 
--- In constrast, average profit per customer is noticeably lower in the Black Sea region at 168.16.
+-- Result: The Mediterranean region has the highest average profit per customer at 207.33.
+-- The Mediterranean, Aegean, Marmara, and Central Anatolia regions all have similar
+-- values of average profit per customer, ranging from 201 and 208. In contrast, average profit
+-- per customer is noticeably lower in the Black Sea region at 186.18.
 
 
 -- Question: Does the retailer make more profit, on average, off customers from certain cities?
@@ -93,17 +93,18 @@ ORDER BY "Average Profit Per-Customer" DESC;
 WITH "tpbc" AS (
     SELECT "CustomerID", "City", SUM("RealizedProfit") AS "TotalProfit"
     FROM "v_master_orders"
-    GROUP BY "CustomerID"
+    GROUP BY "CustomerID", "City"
 )
 
-SELECT "City", ROUND(AVG("TotalProfit"), 2) AS "Average Profit Per-Customer"
+SELECT "City", ROUND(AVG("TotalProfit"), 2) AS "Average Profit Per Customer"
 FROM "tpbc"
 GROUP BY "City"
-ORDER BY "Average Profit Per-Customer" DESC;
+ORDER BY "Average Profit Per Customer" DESC;
 
 -- Result: When looking at individual cities, differences in average profit per customer are quite noticeable.
 -- In Eskisehir, the average profit per customer is 221.55, while in Kocaeli, the average profit per customer is just 180.49.
--- This could show that a customer's city is a better indicator of potential profit than their region.
+-- These more noticeable differences suggest that a customer's city may be more useful for estimating potential
+-- profit than their region.
 
 
 -- Question: Does the retailer make more profit, on average, off customers from a certain gender?
@@ -111,16 +112,17 @@ ORDER BY "Average Profit Per-Customer" DESC;
 WITH "tpbc" AS (
     SELECT "CustomerID", "Gender", SUM("RealizedProfit") AS "TotalProfit"
     FROM "v_master_orders"
-    GROUP BY "CustomerID"
+    GROUP BY "CustomerID", "Gender"
 )
 
-SELECT "Gender", ROUND(AVG("TotalProfit"), 2) AS "Average Profit Per-Customer"
+SELECT "Gender", ROUND(AVG("TotalProfit"), 2) AS "Average Profit Per Customer"
 FROM "tpbc"
 GROUP BY "Gender"
-ORDER BY "Average Profit Per-Customer" DESC;
+ORDER BY "Average Profit Per Customer" DESC;
 
--- Result: The average profit per customer is roughly the same across all genders. Female customers make the retailer the
--- most profit per-customer, with an average profit per-customer of 204.74.
+-- Result: The average profit per customer is roughly the same across all genders. However, female customers do make
+-- the retailer slightly more profit per customer than male customers, with an average profit per customer of 204.74
+-- for females and 200.86 for males.
 
 
 -- Question: Do Premium and VIP customers spend more, on average, than Standard customers?
@@ -131,20 +133,20 @@ WITH "trbc" AS (
     GROUP BY "CustomerID"
 )
 
-SELECT "CustomerSegment", ROUND(AVG("TotalRevenue"), 2) AS "Average Revenue Per-Customer"
+SELECT "CustomerSegment", ROUND(AVG("TotalRevenue"), 2) AS "Average Revenue Per Customer"
 FROM "trbc"
 GROUP BY "CustomerSegment"
-ORDER BY "Average Revenue Per-Customer";
+ORDER BY "Average Revenue Per Customer";
 
--- Result: Premium and VIP members spend noticeably more than Standard customers. Standard customers generate the retailer an average
--- revenue per-customer of 486.81, while Premium members spend almost double that, generating the retailer an average revenue per-customer
--- of 964.69. VIP members spend almost double that amount again, generating the retailer an average revenue per-customer of 1848.04.
+-- Result: Premium and VIP customers spend noticeably more than Standard customers. Standard customers generate the retailer an average
+-- revenue per customer of 486.81, while Premium members spend almost double that, generating the retailer an average revenue per customer
+-- of 964.69. VIP members spend almost double that amount again, generating the retailer an average revenue per customer of 1848.04.
 
 
 -- ------ PRODUCT ANALYSIS -------
 
 
--- Question: Is item price (price per-unit) associated with popularity (total number of units purchased)?
+-- Question: Is a product's price (price per-unit) associated with popularity (total number of units purchased)?
 
 WITH "tq" AS (
     SELECT  
@@ -164,11 +166,11 @@ SELECT "UnitPriceRange", ROUND(AVG("Total Units Purchased"), 2) AS "Average Tota
 FROM "tq"
 GROUP BY "UnitPriceRange";
 
--- Result: Items with higher prices per-unit do tend to be a bit more popular, as items with unit prices in the ranges of 20-30 and 30-40,
--- the two highest ranges for per-unit price, also had the highest averages for total units purchased, at 990.5 and 1038.5 respectively.
+-- Result: Products with higher unit prices do appear to be slightly more popular on average.
+-- Products in the two highest price ranges, the 20-30 and 30-40 ranges, had the highest averages
+-- for total units purchased, at 990.5 and 1038.5 units, respectively.
 
-
--- Question: Which categories are the most popular products typically from?
+-- Question: Which categories do the most popular products come from?
 
 WITH "upp" AS (
     SELECT "ProductID", SUM("Quantity") AS "Total Units Purchased"
@@ -185,5 +187,5 @@ JOIN "categories"
 ORDER BY "Total Units Purchased" DESC
 LIMIT 10;
 
--- Of the ten most popular items (based on units purchased), five are from the "Produce" category, three are from the "Dairy & Eggs"
--- category, and two are from the "Meat & Poultry" category.
+-- Result: Of the ten most popular items (based on units purchased), five are from the "Produce" category, 
+-- three are from the "Dairy & Eggs" category, and two are from the "Meat & Poultry" category.

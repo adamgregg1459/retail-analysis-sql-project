@@ -7,7 +7,7 @@
 -- Explore the categories table
 SELECT * FROM "categories";
 
--- Result: The store in this dataset has ten different product categories,
+-- Result: The store in this dataset has ten different categories for products,
 -- most of which are food-related (e.g., Produce, Bakery), with other categories
 -- including Personal Care and Household Cleaning.
 
@@ -17,7 +17,7 @@ SELECT * FROM "categories";
 -- Explore the customers table
 SELECT * FROM "customers" LIMIT 10;
 
--- Check the number of customers in the dataset
+-- Check the total number of customers in the dataset
 SELECT COUNT(*) AS "Total Customers" FROM "customers";
 
 -- Result: The database has data on 1,000 customers.
@@ -25,7 +25,7 @@ SELECT COUNT(*) AS "Total Customers" FROM "customers";
 -- Check which cities are represented in the dataset
 SELECT DISTINCT "City" FROM "customers";
 
--- Result: The dataset includes customers from ten different cities, all within Turkey.
+-- Result: Ten different cities are represented in the dataset, all within Turkey.
 
 -- Check how customers are classified in the dataset
 SELECT "CustomerSegment", COUNT(*) AS "Count"
@@ -34,9 +34,9 @@ GROUP BY "CustomerSegment"
 ORDER BY "Count" DESC; 
 
 -- Result: Customers can be classified into three groups: "Standard", "Premium", and "VIP".
--- The majority of customers are in the "Standard" group, with a sizable minority in "Premium".
+-- The majority of customers are in the "Standard" group, with a sizable number also in "Premium".
 
--- Check age range of customers in the dataset
+-- Check the age range of customers in the dataset
 SELECT "Age", COUNT(*) AS "Count"
 FROM "customers"
 GROUP BY "Age";
@@ -59,15 +59,15 @@ GROUP BY "DiscountRate";
 -- Result: Discounts are represented as decimals, and range from 0.0 (no discount) to 0.4 (40% off).
 -- The majority of products purchased by customers in this dataset were purchased at full price.
 
--- Check value of first return date
+-- Check value of the earliest return date
 SELECT "ReturnDate"
 FROM "order_details"
 GROUP BY "ReturnDate" 
 LIMIT 1;
 
--- Result: The first return was made on January 4th of 2021.
+-- Result: The earliest return was made on January 4th of 2021.
 
--- Check value of last return date
+-- Check value of the latest return date
 SELECT "ReturnDate"
 FROM "order_details"
 GROUP BY "ReturnDate" 
@@ -79,7 +79,7 @@ LIMIT 1;
 -- Check the percentage of items that get returned
 SELECT ROUND(AVG("IsReturned") * 100, 2) AS "% Returned" FROM "order_details";
 
--- Result: In this dataset, 4.7% of purchases at the retail store get returned.
+-- Result: 4.7% of items purchased in this dataset were returned.
 
 
 -- ----------- ORDERS ------------
@@ -111,6 +111,6 @@ LIMIT 1;
 SELECT * FROM "products" LIMIT 5;
 
 -- Check how many products are in the dataset
-SELECT COUNT(*) AS "Number of Products" FROM "products";
+SELECT COUNT(*) AS "Total Products" FROM "products";
 
--- Result: 100 products being sold at this retailer are in the dataset.
+-- Result: The dataset contains 100 products being sold by the retailer.
